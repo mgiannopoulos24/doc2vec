@@ -128,7 +128,12 @@ int AddWordToVocab(char *word) {
   // Reallocate memory if needed
   if (vocab_size + 2 >= vocab_max_size) {
     vocab_max_size += 1000;
-    vocab = (struct vocab_word *)realloc(vocab, vocab_max_size * sizeof(struct vocab_word));
+    struct vocab_word *temp = (struct vocab_word *)realloc(vocab, vocab_max_size * sizeof(struct vocab_word));
+    if (temp == NULL) {
+      fprintf(stderr, "Memory reallocation failed\n");
+      exit(1);
+    }
+    vocab = temp;
   }
   hash = GetWordHash(word);
   while (vocab_hash[hash] != -1) hash = (hash + 1) % vocab_hash_size;
@@ -163,7 +168,11 @@ void SortVocab() {
       train_words += vocab[a].cn;
     }
   }
-  vocab = (struct vocab_word *)realloc(vocab, (vocab_size + 1) * sizeof(struct vocab_word));
+  struct vocab_word *temp = (struct vocab_word *)realloc(vocab, (vocab_size + 1) * sizeof(struct vocab_word));
+  if (temp == NULL) {
+    fprintf(stderr, "Memory reallocation failed\n");
+    exit(1);
+  }
   // Allocate memory for the binary tree construction
   for (a = 0; a < vocab_size; a++) {
     vocab[a].code = (char *)calloc(MAX_CODE_LENGTH, sizeof(char));
